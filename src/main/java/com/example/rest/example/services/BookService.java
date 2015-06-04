@@ -61,5 +61,49 @@ public class BookService {
             executor.execute(r);
 
         });
+        
 }
+
+    public Observable<JsonArray> getComments(final String isbn) {
+        return Observable.create((Observable.OnSubscribe<JsonArray>) subscriber -> {
+
+            Runnable r = () -> {
+                subscriber.onNext(commentServiceTarget.path(isbn).request().get(JsonArray.class));
+                subscriber.onCompleted();
+            };
+
+            executor.execute(r);
+
+        });
+        
+        
+}    
+
+    @GET
+    @Path("{isbn}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public void bookAndComment(@Suspended final AsyncResponse asyncResponse, @PathParam("isbn") String isbn) {
+        //Calling previous defined functions
+        Observable<JsonObject> bookInfo = getBookInfo(isbn);
+        Observable<JsonArray> comments = getComments(isbn);
+
+        Observable.zip(bookInfo, comments, (JsonObject book, JsonArray bookcomments) ->
+                        Json.createObjectBuilder().add("book", book).add("comments", bookcomments).build()
+                      )
+                      .subscribe(new Subscriber<JsonObject>() {
+                            @Override
+                            public void onCompleted() {
+                            }
+                    
+                            @Override
+                            public void onError(Throwable e) {
+                                asyncResponse.resume(e);
+                            }
+
+                            @Override
+                            public void onNext(JsonObject jsonObject) {
+                                asyncResponse.resume(jsonObject);
+                            }
+                        });
+    }
 }
