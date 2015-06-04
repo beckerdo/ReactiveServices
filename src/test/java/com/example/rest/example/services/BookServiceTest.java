@@ -4,6 +4,10 @@ import java.net.URL;
 import java.net.URI;
 import java.net.MalformedURLException;
 
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

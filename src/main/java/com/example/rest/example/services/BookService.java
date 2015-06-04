@@ -9,9 +9,20 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.enterprise.concurrent.ManagedExecutorService;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.Json;
 
 import com.sun.jersey.spi.resource.Singleton;
 
@@ -41,14 +52,6 @@ public class BookService {
         commentServiceTarget = commentServiceClient.target(COMMENTSERVICE + "/rest/comments");
 
     }
-
-    @GET
-    @Path("{isbn}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public void bookAndComment(@Suspended final AsyncResponse asyncResponse, @PathParam("isbn") String isbn) {
-    //RxJava code shown below
-    }
-    
     
     public Observable<JsonObject> getBookInfo(final String isbn) {
         return Observable.create((Observable.OnSubscribe<JsonObject>) subscriber -> {
